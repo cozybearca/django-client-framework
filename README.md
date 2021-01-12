@@ -1,1 +1,1 @@
-# django_client_framework
+# Django Client Framework
