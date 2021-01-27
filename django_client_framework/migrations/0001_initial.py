@@ -2,8 +2,8 @@
 
 import django.contrib.postgres.indexes
 import django.contrib.postgres.search
-from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -11,30 +11,50 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
+        ("contenttypes", "0002_remove_content_type_name"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SearchFeature',
+            name="SearchFeature",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('object_id', models.PositiveIntegerField(db_index=True, null=True)),
-                ('text_feature', models.TextField()),
-                ('search_vector', django.contrib.postgres.search.SearchVectorField()),
-                ('content_type', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("object_id", models.PositiveIntegerField(db_index=True, null=True)),
+                ("text_feature", models.TextField()),
+                ("search_vector", django.contrib.postgres.search.SearchVectorField()),
+                (
+                    "content_type",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="contenttypes.contenttype",
+                    ),
+                ),
             ],
         ),
         migrations.AddIndex(
-            model_name='searchfeature',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['search_vector'], name='django_clie_search__83d87e_gin'),
+            model_name="searchfeature",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["search_vector"], name="django_clie_search__83d87e_gin"
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='searchfeature',
-            unique_together={('object_id', 'content_type')},
+            name="searchfeature",
+            unique_together={("object_id", "content_type")},
         ),
         migrations.AlterIndexTogether(
-            name='searchfeature',
-            index_together={('object_id', 'content_type')},
+            name="searchfeature",
+            index_together={("object_id", "content_type")},
+        ),
+        migrations.RunSQL(
+            sql="create extension pg_jieba", reverse_sql="drop extension pg_jieba"
         ),
     ]
