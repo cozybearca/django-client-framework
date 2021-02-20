@@ -31,3 +31,24 @@ def dcf_exception_handler(exc, context):
         from rest_framework.views import exception_handler
 
         return exception_handler(exc, context)
+
+
+class ConvertAPIExceptionToJsonResponse:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # One-time configuration and initialization.
+
+    def __call__(self, request):
+        # Code to be executed for each request before
+        # the view (and later middleware) are called.
+        response = self.get_response(request)
+
+        # Code to be executed for each request/response after
+        # the view is called.
+        return response
+
+    def process_exception(self, request, expt):
+        if isinstance(expt, APIException):
+            return JsonResponse(expt.detail, status=expt.status_code, safe=False)
+        else:
+            return None
