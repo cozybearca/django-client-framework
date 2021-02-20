@@ -7,7 +7,7 @@ from django.contrib.postgres.search import SearchQuery
 from django.core.cache import cache
 from django.db import models as m
 from django.db.backends.signals import connection_created
-from django.db.models.signals import post_delete, post_save, pre_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
 from guardian.models import UserObjectPermission

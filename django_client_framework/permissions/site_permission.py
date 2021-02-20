@@ -196,13 +196,6 @@ def setup_permissions():
         default_users.setup()
         # set user self permission
         # must be done after all default users are added
-
-        from .auto import auto_add_user_self_permission
-
-        User = get_user_model()
-
-        for user in User.objects.all():
-            auto_add_user_self_permission(sender=User, instance=user, created=True)
         from django_client_framework.models import AccessControlled
 
         for model in AccessControlled.__subclasses__():
