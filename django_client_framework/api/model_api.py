@@ -174,11 +174,11 @@ class BaseModelAPI(GenericAPIView):
         if p.has_perms_shortcut(self.user_object, object, "r"):
             if field_name:
                 raise e.PermissionDenied(
-                    f"You do not have {shortcuts[required_perm]} permission on {objname}'s {field_name} field."
+                    f"You have no {shortcuts[required_perm]} permission on {objname}'s {field_name} field."
                 )
             else:
                 raise e.PermissionDenied(
-                    f"You do not have {shortcuts[required_perm]} permission on {objname}."
+                    f"You have no {shortcuts[required_perm]} permission on {objname}."
                 )
         else:
             raise e.NotFound(f"{objname} cannot be found.")
@@ -378,7 +378,7 @@ class ModelFieldAPI(BaseModelAPI):
             )
             if has_read.exists():
                 raise e.PermissionDenied(
-                    f"You do not have write permission on objects {list(has_read.values_list('pk'))}"
+                    f"You have no write permission on objects {list(has_read.values_list('pk'))}"
                 )
             else:
                 raise e.NotFound()
