@@ -9,7 +9,6 @@ from django.dispatch import receiver
 from django_currentuser.middleware import _set_current_user
 
 from .default_groups import default_groups
-from .site_permission import set_perms_shortcut
 
 LOGGER = getLogger(__name__)
 
@@ -18,12 +17,6 @@ LOGGER = getLogger(__name__)
 def auto_add_user_to_anyone_group(sender, instance, created, **kwargs):
     if created and instance != get_user_model().get_anonymous():
         default_groups.anyone.user_set.add(instance)
-
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def auto_add_user_self_permission(sender, instance, created, **kwargs):
-    if created and instance != get_user_model().get_anonymous():
-        set_perms_shortcut(instance, instance, "rwd")
 
 
 @receiver(request_finished)
