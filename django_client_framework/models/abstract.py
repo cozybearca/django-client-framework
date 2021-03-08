@@ -6,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import SearchQuery
 from django.core.cache import cache
 from django.db import models as m
-from django.db.backends.signals import connection_created
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -15,13 +14,6 @@ from guardian.models import UserObjectPermission
 from .search_feature import SearchFeature
 
 LOG = getLogger(__name__)
-
-
-# install jieba extension
-@receiver(connection_created)
-def install_jieba_extension(sender, connection, **kwargs):
-    cursor = connection.cursor()
-    cursor.execute("create extension if not exists pg_jieba")
 
 
 class Serializable(m.Model):
