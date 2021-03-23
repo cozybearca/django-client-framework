@@ -17,10 +17,6 @@ class DefaultApp(AppConfig):
 
         from django.conf import settings
 
-        settings.REST_FRAMEWORK[
-            "EXCEPTION_HANDLER"
-        ] = "django_client_framework.exceptions.handlers.dcf_exception_handler"
-
         from django_client_framework.permissions import auto  # noqa
 
         if settings.DEBUG or settings.TUNE_TEST:
