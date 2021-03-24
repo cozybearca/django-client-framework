@@ -18,5 +18,18 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    install_requires=[
+        "setuptools",
+        "djangorestframework",
+        "django",
+        "jsonschema",
+        "rfc3987",
+        "strict-rfc3339",
+    ],
     python_requires=">=3.8",
+    entry_points={
+        "console_scripts": [
+            "dcf_clientschema=django_client_framework.client_schema.cli:main",
+        ],
+    },
 )
