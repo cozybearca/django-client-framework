@@ -1,0 +1,13 @@
+version: "3"
+services:
+  dcf-test-ubuntu-base:
+    build:
+      context: .
+      dockerfile: ubuntu-base.dockerfile
+    image: dcf-test-ubuntu-base
+
+  dcf-test-example:
+    image: dcf-test-ubuntu-base
+    volumes:
+      - ./example/entrypoint.py:/entrypoint.py
+    command: ["python3", /entrypoint.py]
