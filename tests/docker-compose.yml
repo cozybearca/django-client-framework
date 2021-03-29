@@ -1,0 +1,15 @@
+version: "3"
+services:
+  dcf-test-ubuntu-base:
+    build:
+      context: .
+      dockerfile: ubuntu-base.dockerfile
+    image: dcf-test-ubuntu-base
+
+  dcf-test-example:
+    image: dcf-test-ubuntu-base
+    volumes:
+      - ./dcf-backend-example/dcf-backend-example-proj:/dcf-backend-example-proj # build output
+      - ./dcf-backend-example/entrypoint.py:/entrypoint.py:ro
+      - ../:/django_client_framework:ro
+    command: ["python3", /entrypoint.py]
