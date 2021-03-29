@@ -1,3 +1,9 @@
 [submodule "clients/django-client-framework-typescript"]
 	path = clients/django-client-framework-typescript
 	url = https://github.com/cozybearca/django-client-framework-typescript.git
+[submodule "clients/django-client-framework-kotlin"]
+	path = clients/django-client-framework-kotlin
+	url = https://github.com/cozybearca/django-client-framework-kotlin.git
+[submodule "clients/django-client-framework-swift"]
+	path = clients/django-client-framework-swift
+	url = https://github.com/cozybearca/django-client-framework-swift.git
