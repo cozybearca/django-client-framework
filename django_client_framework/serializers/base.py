@@ -175,7 +175,7 @@ def check_integrity():
             model not in generate_jsonschema_for_models
             or not generate_jsonschema_for_models[model]
         ):
-            raise NotImplementedError(
+            LOG.warn(
                 f"{model} is a registered api model but does not have a generated json schema"
             )
 

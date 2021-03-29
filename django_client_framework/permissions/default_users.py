@@ -27,5 +27,9 @@ class DefaultUsers:
             user = get_user_model().objects.get_or_create(username=name)[0]
             config_func(user)
 
+    @property
+    def anonymous(self):
+        return get_user_model().get_anonymous()
+
 
 default_users = DefaultUsers()

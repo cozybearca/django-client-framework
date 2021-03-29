@@ -8,6 +8,8 @@ from django.db import transaction
 from django.db.models.base import ModelBase
 from guardian import models as gm
 from guardian import shortcuts as gs
+from deprecation import deprecated
+from . import default_groups
 
 LOG = getLogger(__name__)
 
@@ -50,32 +52,45 @@ def get_permission_for_model(
 
 def filter_queryset_by_perms_shortcut(perms, user_or_group, queryset, field_name=None):
     """
-    Filters queryset by keeping objects that user_or_group has all permissions specified
-    by perms. If field_name is specified, additionally include objects that
-    user_or_group has field permission on.
+    Filters queryset by keeping objects that user_or_group has all permissions
+    specified by perms. If field_name is specified, additionally include objects
+    that user_or_group has field permission on.
+
+    Warning: Different from has_perms_shortcut(), this function accounts for the
+    special "anyone" group. If a permission is set on the "anyone" group, then
+    filter_queryset_by_perms_shortcut() views any group or user has that
+    permission. On the other hand, has_perms_shortcut() ignores the "anyone"
+    group's permission.
+
+    Algorithm:
+        perms: rwcd \in {0,1}^4
+        with/no field: f \in {0,1}
+        normal/anyone user: u \in {0,1}
+        A0 = filter with rwcd mask, f=0
+        A1 = filter with rwcd mask, f=1
+        B0 = A0 union A1, g=0
+        B1 = A0 union A1, g=1
+        B0 union B1
     """
-    for s in perms.lower():  # conjunctive
-        tmp = queryset.model.objects.none()
-        for f in set([None, field_name]):
-            gsfilter = (
+    union = queryset.model.objects.none()
+    for u in set([user_or_group, default_groups.anyone]):  # B
+        for f in set([None, field_name]):  # A
+            perm_full_strs = [
+                get_permission_for_model(s, queryset.model, string=True, field_name=f)
+                for s in perms.lower()
+            ]
+            union |= (
                 gs.get_objects_for_group
-                if isinstance(user_or_group, Group)
+                if isinstance(u, Group)
                 else gs.get_objects_for_user
-            )
-            tmp |= gsfilter(
-                user_or_group,
-                perms=get_permission_for_model(
-                    s,
-                    queryset.model,
-                    string=True,
-                    field_name=f,
-                ),
+            )(
+                u,
+                perms=perm_full_strs,
                 accept_global_perms=True,
                 any_perm=False,
-                klass=queryset,
+                klass=queryset,  # filter
             )
-        queryset = tmp
-    return queryset
+    return union
 
 
 def set_perms_shortcut(
@@ -181,7 +196,7 @@ def clear_permissions():
         Group.objects.exclude(m.Q(name="anyone") | m.Q(name="logged_in")).delete()
 
 
-def setup_permissions():
+def reset_permissions():
     with transaction.atomic():
         LOG.info("resetting permissions...")
 
@@ -202,3 +217,8 @@ def setup_permissions():
             permmanager = model.get_permissionmanager_class()()
             for instance in model.objects.all():
                 permmanager.reset_perms(instance)
+
+
+@deprecated(details="use reset_permissions()")
+def setup_permissions():
+    reset_permissions()
