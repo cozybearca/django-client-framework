@@ -25,6 +25,11 @@ setuptools.setup(
         "jsonschema",
         "rfc3987",
         "strict-rfc3339",
+        "psycopg2-binary",
+        "django-guardian",
+        "django-currentuser",
+        "ipromise",
+        "deprecation",
     ],
     python_requires=">=3.8",
     entry_points={
