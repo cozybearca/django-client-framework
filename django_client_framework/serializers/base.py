@@ -5,11 +5,9 @@ from django.db.models.fields.related import ForeignKey
 from django.utils.functional import cached_property
 from django_client_framework.exceptions import ValidationError
 from ipromise.overrides import overrides
-from rest_framework.serializers import (
-    BaseSerializer,
-    ModelSerializer,
-    PrimaryKeyRelatedField,
-)
+from rest_framework.serializers import BaseSerializer
+from rest_framework.serializers import ModelSerializer as DRFModelSerializer
+from rest_framework.serializers import PrimaryKeyRelatedField
 from rest_framework.utils.model_meta import RelationInfo
 
 LOG = getLogger(__name__)
@@ -24,7 +22,7 @@ def get_model_field(model, key, default=None):
 
 def register_serializer_field(for_model_field):
     def make_decorator(serializer_field):
-        DCFModelSerializer.additional_serializer_field_mapping[
+        ModelSerializer.additional_serializer_field_mapping[
             for_model_field
         ] = serializer_field
         return serializer_field
@@ -32,7 +30,7 @@ def register_serializer_field(for_model_field):
     return make_decorator
 
 
-class DCFModelSerializer(ModelSerializer):
+class ModelSerializer(DRFModelSerializer):
     additional_serializer_field_mapping = {}
 
     @cached_property
@@ -41,7 +39,7 @@ class DCFModelSerializer(ModelSerializer):
         mapping.update(self.additional_serializer_field_mapping)
         return mapping
 
-    @overrides(ModelSerializer)
+    @overrides(DRFModelSerializer)
     def get_default_field_names(self, declared_fields, model_info):
         """
         Return the default list of field names that will be used if the
@@ -64,7 +62,7 @@ class DCFModelSerializer(ModelSerializer):
             ]
         )
 
-    @overrides(ModelSerializer)
+    @overrides(DRFModelSerializer)
     def build_field(self, field_name, info, model_class, nested_depth):
         suffix = "_id"
         if field_name.endswith(suffix):
@@ -136,6 +134,9 @@ class DCFModelSerializer(ModelSerializer):
             raise ValidationError(**{field_name: "This field is required."})
 
 
+DCFModelSerializer = ModelSerializer
+
+
 class GenerateJsonSchemaDecorator:
     for_model_read = {}
     for_model_write = {}
@@ -185,7 +186,7 @@ def check_integrity():
                 f"{model} has a generated json schema but is not a registered api model"
             )
 
-    for serializer_cls in DCFModelSerializer.__subclasses__():
+    for serializer_cls in ModelSerializer.__subclasses__():
         model = serializer_cls.Meta.model
         for field_name in getattr(serializer_cls.Meta, "fields", []):
             if field_name not in serializer_cls().fields:
