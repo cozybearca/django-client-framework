@@ -148,31 +148,32 @@ def has_perms_shortcut(
         return True
 
     def disjunction(s):
-        for f in [None, field_name]:
-            perm = get_permission_for_model(s, model, field_name=f)
-            if isinstance(user_or_group, Group):
-                # check group model permission
-                if user_or_group.permissions.filter(pk=perm.pk).exists():
-                    yield True
-                # check group object permission
-                if (
-                    instance
-                    and gm.GroupObjectPermission.objects.filter(
-                        group=user_or_group,
-                        permission=perm,
-                        content_type=perm.content_type,
-                        object_pk=instance.pk,
-                    ).exists()
-                ):
-                    yield True
-            else:
-                # check user model permission
-                name = f"{perm.content_type.app_label}.{perm.codename}"
-                if user_or_group.has_perm(name):
-                    yield True
-                # check user object permission
-                if user_or_group.has_perm(name, instance):
-                    yield True
+        for u in set([default_groups.anyone, user_or_group]):
+            for f in set([None, field_name]):
+                perm = get_permission_for_model(s, model, field_name=f)
+                if isinstance(u, Group):
+                    # check group model permission
+                    if u.permissions.filter(pk=perm.pk).exists():
+                        yield True
+                    # check group object permission
+                    if (
+                        instance
+                        and gm.GroupObjectPermission.objects.filter(
+                            group=u,
+                            permission=perm,
+                            content_type=perm.content_type,
+                            object_pk=instance.pk,
+                        ).exists()
+                    ):
+                        yield True
+                else:
+                    # check user model permission
+                    name = f"{perm.content_type.app_label}.{perm.codename}"
+                    if u.has_perm(name):
+                        yield True
+                    # check user object permission
+                    if u.has_perm(name, instance):
+                        yield True
         yield False
 
     def conjunction():
