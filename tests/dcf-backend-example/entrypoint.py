@@ -42,7 +42,6 @@ django_client_framework.settings.install(
 def installation():
     for cmd in [
         "pip3 install /django_client_framework",
-        "pip3 install psycopg2-binary",
         "django-admin startproject dcf_backend_example",
         f"mv /dcf_backend_example/* {PROJ.absolute()}",
         f"touch {PROJ.absolute()}/__init__.py",
@@ -72,7 +71,7 @@ def django_runserver() -> Popen:
     return proc
 
 
-def create_product():
+def create_objects():
     env = os.environ.copy()
     env.update({"PYTHONPATH": PROJ.absolute()})
     shell(
@@ -80,9 +79,9 @@ def create_product():
         cwd=PROJ,
         env=env,
         input="""
-from dcf_backend_example.common.models import Product
-Product.objects.create(barcode="xxyy")
-Product.objects.all()
+from dcf_backend_example.common.models import Product, Brand
+nike = Brand.objects.create(name="nike")
+Product.objects.create(barcode="xxyy", brand=nike)
 """,
     )
 
@@ -101,10 +100,6 @@ reset_permissions()
     )
 
 
-def send_get_request():
-    return shell("curl http://localhost:8000/product", capture_output=True)
-
-
 def clear():
     for content in PROJ.iterdir():
         if content.is_dir():
@@ -113,34 +108,8 @@ def clear():
             content.unlink()
 
 
-def create_product_model():
-    content = """
-from django_client_framework.models import Serializable, AccessControlled
-from django_client_framework.serializers import ModelSerializer
-from django_client_framework.permissions import default_groups, set_perms_shortcut
-from django_client_framework.api import register_api_model
-from django.db.models import CharField
-
-
-@register_api_model
-class Product(Serializable, AccessControlled):
-    barcode = CharField(max_length=32)
-
-    @classmethod
-    def serializer_class(cls):
-        return ProductSerializer
-
-    class PermissionManager(AccessControlled.PermissionManager):
-        def add_perms(self, product):
-            set_perms_shortcut(default_groups.anyone, product, "r")
-
-
-class ProductSerializer(ModelSerializer):
-    class Meta:
-        model = Product
-        exclude = []
-"""
-    (PROJ / "dcf_backend_example/common/models.py").write_text(content)
+def create_model():
+    shutil.copyfile("/proj/models.py", PROJ / "dcf_backend_example/common/models.py")
 
 
 def add_routes():
@@ -158,6 +127,53 @@ urlpatterns += django_client_framework.api.urls.urlpatterns
 
 
 class Test(unittest.TestCase):
+    """
+    The goal of this suite is to test for Django Client Framework's
+    installation, making sure the instruction is up-to-date.
+    """
+
+    def query_product_list(self):
+        result = shell("curl http://localhost:8000/product", capture_output=True)
+        self.assertEqual(result.returncode, 0)
+        response = json.loads(result.stdout)
+        self.assertEqual(response["total"], 1)
+        self.assertEqual(
+            response["objects"],
+            [{"id": 1, "barcode": "xxyy", "brand_id": 1}],
+        )
+
+    def query_product(self):
+        result = shell("curl http://localhost:8000/product/1", capture_output=True)
+        self.assertEqual(result.returncode, 0)
+        response = json.loads(result.stdout)
+        self.assertEqual(response, {"id": 1, "barcode": "xxyy", "brand_id": 1})
+
+    def query_product_brand(self):
+        result = shell(
+            "curl http://localhost:8000/product/1/brand", capture_output=True
+        )
+        self.assertEqual(result.returncode, 0)
+        response = json.loads(result.stdout)
+        self.assertEqual(response, {"id": 1, "name": "nike"})
+
+    def query_brand(self):
+        result = shell("curl http://localhost:8000/brand/1", capture_output=True)
+        self.assertEqual(result.returncode, 0)
+        response = json.loads(result.stdout)
+        self.assertEqual(response, {"id": 1, "name": "nike"})
+
+    def query_brand_product_list(self):
+        result = shell(
+            "curl http://localhost:8000/brand/1/products", capture_output=True
+        )
+        self.assertEqual(result.returncode, 0)
+        response = json.loads(result.stdout)
+        self.assertEqual(response["total"], 1)
+        self.assertEqual(
+            response["objects"],
+            [{"id": 1, "barcode": "xxyy", "brand_id": 1}],
+        )
+
     def test_main(self):
         server = None
 
@@ -166,17 +182,16 @@ class Test(unittest.TestCase):
             installation()
             write_to_settings()
             add_routes()
-            create_product_model()
+            create_model()
             run_migration()
-            create_product()
+            create_objects()
             set_permissions()
             server = django_runserver()
-            result = send_get_request()
-
-            self.assertEqual(result.returncode, 0)
-            response = json.loads(result.stdout)
-            self.assertEqual(response["total"], 1)
-            self.assertEqual(response["objects"], [{"id": 1, "barcode": "xxyy"}])
+            self.query_product_list()
+            self.query_product()
+            self.query_product_brand()
+            self.query_brand()
+            self.query_brand_product_list()
 
         except SubprocessError as err:
             exit(err.returncode)

@@ -1,0 +1,19 @@
+{
+  "name": "proj",
+  "version": "1.0.0",
+  "main": "buiild/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "django-client-framework": "file:///django-client-framework-typescript"
+  }
+}

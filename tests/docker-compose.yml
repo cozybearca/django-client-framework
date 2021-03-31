@@ -9,7 +9,19 @@ services:
   dcf-test-example:
     image: dcf-test-ubuntu-base
     volumes:
-      - ./dcf-backend-example/dcf-backend-example-proj:/dcf-backend-example-proj # build output
+      - ./dcf-backend-example/proj:/proj:ro
       - ./dcf-backend-example/entrypoint.py:/entrypoint.py:ro
+      - ./dcf-backend-example/dcf-backend-example-proj:/dcf-backend-example-proj # build output
       - ../:/django_client_framework:ro
+    command: ["python3", /entrypoint.py]
+
+  dcf-test-example-ts:
+    image: dcf-test-ubuntu-base
+    volumes:
+      - ../:/django_client_framework:ro
+      - ../clients/django-client-framework-typescript:/django-client-framework-typescript:ro
+      - ./dcf-backend-example/dcf-backend-example-proj.tar.gz:/dcf-backend-example-proj.tar.gz:ro
+      - ./dcf-client-typescript-example/proj:/proj:ro
+      - ./dcf-client-typescript-example/entrypoint.py:/entrypoint.py:ro
+      - ./dcf-client-typescript-example/proj-out:/proj-out # build output
     command: ["python3", /entrypoint.py]
