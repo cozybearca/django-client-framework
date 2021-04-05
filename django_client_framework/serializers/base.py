@@ -165,7 +165,7 @@ generate_jsonschema = GenerateJsonSchemaDecorator()
 
 
 def check_integrity():
-    from django_client_framework.api.BaseModelAPI import BaseModelAPI
+    from django_client_framework.api import BaseModelAPI
 
     generate_jsonschema_for_models = {
         **generate_jsonschema.for_model_read,

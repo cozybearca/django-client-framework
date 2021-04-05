@@ -1,5 +1,5 @@
 from django_client_framework.models.abstract import Serializable
-from .BaseModelAPI import BaseModelAPI
+from .base_model_api import BaseModelAPI
 
 
 def register_api_model(model_class):
