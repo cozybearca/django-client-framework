@@ -11,3 +11,9 @@ from .abstract import (
 )
 from .fields import PriceField, UniqueForeignKey
 from .lookup import *
+
+
+def check_integrity():
+    from . import abstract
+
+    abstract.check_integrity()

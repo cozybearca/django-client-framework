@@ -10,3 +10,9 @@ from .base import (
 )
 from .delegate import DelegateSerializer
 from .fields import *
+
+
+def check_integrity():
+    from . import base
+
+    base.check_integrity()

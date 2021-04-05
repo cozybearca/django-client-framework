@@ -20,10 +20,8 @@ class DefaultApp(AppConfig):
         from django_client_framework.permissions import auto  # noqa
 
         if settings.DEBUG or settings.TUNE_TEST:
-            from django_client_framework.api import model_api
-            from django_client_framework.models import abstract as model_abstract
-            from django_client_framework.serializers import base as serializer_base
+            import django_client_framework
 
-            model_abstract.check_integrity()
-            model_api.check_integrity()
-            serializer_base.check_integrity()
+            django_client_framework.api.check_integrity()
+            django_client_framework.models.check_integrity()
+            django_client_framework.serializers.check_integrity()
