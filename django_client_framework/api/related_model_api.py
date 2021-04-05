@@ -10,12 +10,12 @@ from ipromise import overrides
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .BaseModelAPI import BaseModelAPI
+from .base_model_api import BaseModelAPI
 
 LOG = getLogger(__name__)
 
 
-class ModelFieldAPI(BaseModelAPI):
+class RelatedModelAPI(BaseModelAPI):
     """ handle requests such as GET/POST/PUT /products/1/images """
 
     @property

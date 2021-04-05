@@ -7,7 +7,7 @@ from django_client_framework import permissions as p
 from ipromise import overrides
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .BaseModelAPI import BaseModelAPI
+from .base_model_api import BaseModelAPI
 
 LOG = getLogger(__name__)
 

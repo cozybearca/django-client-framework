@@ -18,10 +18,11 @@ class DefaultApp(AppConfig):
         from django.conf import settings
 
         from django_client_framework.permissions import auto  # noqa
+        from .models import Searchable  # noqa
 
         if settings.DEBUG or settings.TUNE_TEST:
-            import django_client_framework
+            from . import api, models, serializers
 
-            django_client_framework.api.check_integrity()
-            django_client_framework.models.check_integrity()
-            django_client_framework.serializers.check_integrity()
+            api.check_integrity()
+            models.check_integrity()
+            serializers.check_integrity()

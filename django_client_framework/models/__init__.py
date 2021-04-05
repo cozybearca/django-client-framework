@@ -2,13 +2,9 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.postgres.fields import *
 from django.db.models import *
 
-from .abstract import (
-    AccessControlled,
-    Searchable,
-    Serializable,
-    delete_searchfeature_on_delete,
-    update_searchfeature_on_change,
-)
+from .abstract import AccessControlled, Serializable, Searchable
+from .search_feature import SearchFeature
+
 from .fields import PriceField, UniqueForeignKey
 from .lookup import *
 
