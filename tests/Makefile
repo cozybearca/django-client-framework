@@ -13,3 +13,9 @@ example: ubuntu-base
 example-ts: example
 	docker-compose run dcf-test-example-ts
 
+.PHONY: format
+format:
+	black .
+
+.PHONY: all
+all: example example-ts format

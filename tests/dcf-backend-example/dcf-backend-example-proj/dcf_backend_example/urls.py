@@ -1,4 +1,5 @@
 import django_client_framework.api.urls
+from django.urls import include
 
 """dcf_backend_example URL Configuration
 
@@ -23,4 +24,4 @@ urlpatterns = [
 ]
 
 
-urlpatterns += django_client_framework.api.urls.urlpatterns
+urlpatterns.append(path("", include(django_client_framework.api.urls.urlpatterns)))

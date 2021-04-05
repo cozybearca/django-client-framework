@@ -118,10 +118,11 @@ def add_routes():
     urls_py.write_text(
         f"""
 import django_client_framework.api.urls
+from django.urls import include
 
 {content}
 
-urlpatterns += django_client_framework.api.urls.urlpatterns
+urlpatterns.append(path("", include(django_client_framework.api.urls.urlpatterns)))
 """
     )
 
