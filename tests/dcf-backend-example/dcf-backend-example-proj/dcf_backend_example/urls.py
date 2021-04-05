@@ -1,4 +1,3 @@
-
 import django_client_framework.api.urls
 
 """dcf_backend_example URL Configuration
@@ -20,7 +19,7 @@ from django.contrib import admin
 from django.urls import path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 ]
 
 
