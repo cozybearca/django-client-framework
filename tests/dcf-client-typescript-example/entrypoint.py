@@ -51,7 +51,7 @@ def yarn_build():
 
 
 def run_app():
-    shell("node build/index.js", cwd=PROJ)
+    shell("node build/main.js", cwd=PROJ)
 
 
 class Test(unittest.TestCase):
