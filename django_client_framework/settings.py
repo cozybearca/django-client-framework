@@ -5,6 +5,7 @@ def install(
     AUTHENTICATION_BACKENDS,
 ):
     INSTALLED_APPS += [
+        "rest_framework",
         "guardian",
         "django_client_framework.apps.DefaultApp",
     ]
