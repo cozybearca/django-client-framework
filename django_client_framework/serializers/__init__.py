@@ -13,6 +13,6 @@ from .fields import *
 
 
 def check_integrity():
-    from . import base
+    from . import model_serializer
 
-    base.check_integrity()
+    model_serializer.check_integrity()

@@ -9,6 +9,7 @@ from rest_framework.serializers import BaseSerializer
 from rest_framework.serializers import ModelSerializer as DRFModelSerializer
 from rest_framework.serializers import PrimaryKeyRelatedField
 from rest_framework.utils.model_meta import RelationInfo
+from .serializer import Serializer
 
 LOG = getLogger(__name__)
 
@@ -30,7 +31,7 @@ def register_serializer_field(for_model_field):
     return make_decorator
 
 
-class ModelSerializer(DRFModelSerializer):
+class ModelSerializer(Serializer, DRFModelSerializer):
     additional_serializer_field_mapping = {}
 
     @cached_property
