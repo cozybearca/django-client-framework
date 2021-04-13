@@ -1,6 +1,6 @@
 setuptools
 djangorestframework
-django
+django>=3.2
 jsonschema
 rfc3987
 strict-rfc3339
