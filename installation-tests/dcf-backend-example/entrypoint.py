@@ -5,7 +5,7 @@ import os
 import json
 import unittest
 
-PROJ = Path("/dcf-backend-example-proj")
+PROJ = Path("/_out")
 
 
 def debug():
@@ -25,6 +25,8 @@ import django_client_framework.settings
 
 {content}
 
+# added by entrypoint.py
+
 REST_FRAMEWORK = {{}}
 AUTHENTICATION_BACKENDS = []
 INSTALLED_APPS += ["dcf_backend_example.common"]
@@ -42,15 +44,12 @@ django_client_framework.settings.install(
 def installation():
     for cmd in [
         "pip3 install /django_client_framework",
-        "django-admin startproject dcf_backend_example",
-        f"mv /dcf_backend_example/* {PROJ.absolute()}",
-        f"touch {PROJ.absolute()}/__init__.py",
+        f"django-admin startproject dcf_backend_example {PROJ.absolute()}",
+        "mkdir dcf_backend_example/common",
+        "python3 ./manage.py startapp common dcf_backend_example/common",
+        "cp /_overwrite/apps.py dcf_backend_example/common/apps.py",
     ]:
-        shell(cmd)
-    shell(
-        "python3 ../manage.py startapp common",
-        cwd=PROJ / "dcf_backend_example",
-    )
+        shell(cmd, cwd=PROJ)
 
 
 def run_migration():
@@ -109,7 +108,9 @@ def clear():
 
 
 def create_model():
-    shutil.copyfile("/proj/models.py", PROJ / "dcf_backend_example/common/models.py")
+    shutil.copyfile(
+        "/_overwrite/models.py", PROJ / "dcf_backend_example/common/models.py"
+    )
 
 
 def add_routes():
@@ -122,9 +123,17 @@ from django.urls import include
 
 {content}
 
-urlpatterns.append(path("", include(django_client_framework.api.urls.urlpatterns)))
+urlpatterns.append(path("", include(django_client_framework.api.urls)))
 """
     )
+
+
+def zip_package():
+    for cmd in [
+        "tar -czvf /tmp/dcf-backend-example.tar.gz .",
+        "mv /tmp/dcf-backend-example.tar.gz ./dcf-backend-example.tar.gz",
+    ]:
+        shell(cmd, cwd=PROJ)
 
 
 class Test(unittest.TestCase):
@@ -193,6 +202,7 @@ class Test(unittest.TestCase):
             self.query_product_brand()
             self.query_brand()
             self.query_brand_product_list()
+            zip_package()
 
         except SubprocessError as err:
             exit(err.returncode)

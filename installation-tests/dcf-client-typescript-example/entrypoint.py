@@ -5,7 +5,7 @@ import os
 import json
 import unittest
 
-PROJ = Path("/proj-out")
+PROJ = Path("/_out")
 
 
 def debug():
@@ -27,11 +27,12 @@ def clear():
 
 def django_runserver() -> Popen:
     shell("pip3 install /django_client_framework")
-    shell("tar -xzvf /dcf-backend-example-proj.tar.gz", cwd="/")
+    shell("mkdir /dcf-backend-example")
+    shell("tar -xzvf /dcf-backend-example.tar.gz", cwd="/dcf-backend-example")
     proc = Popen(
         "python3 ./manage.py runserver",
         shell=True,
-        cwd="/dcf-backend-example/dcf-backend-example-proj",
+        cwd="/dcf-backend-example",
     )
     shell("wait-for-it localhost:8000")
     return proc
@@ -39,7 +40,7 @@ def django_runserver() -> Popen:
 
 def installation():
     for cmd in [
-        "cp /proj/* /proj-out",
+        "cp /proj/* /_out",
         "yarn add file:///django-client-framework-typescript",
         "yarn install --dev",
     ]:

@@ -6,7 +6,6 @@ ubuntu-base:
 .PHONY: example
 example: ubuntu-base
 	docker-compose run dcf-test-example
-	tar -czvf dcf-backend-example/dcf-backend-example-proj.tar.gz dcf-backend-example/dcf-backend-example-proj
 
 
 .PHONY: example-ts
@@ -15,7 +14,8 @@ example-ts: example
 
 .PHONY: format
 format:
-	black .
+	sudo chmod a+w -R ..
+	black ..
 
 .PHONY: all
 all: example example-ts format

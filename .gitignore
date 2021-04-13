@@ -132,3 +132,5 @@ node_modules/
 *.tar
 *.gz
 *.tz
+
+_out/
