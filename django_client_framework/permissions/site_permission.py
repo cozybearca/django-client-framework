@@ -93,7 +93,7 @@ def filter_queryset_by_perms_shortcut(perms, user_or_group, queryset, field_name
     return union
 
 
-def set_perms_shortcut(
+def add_perms_shortcut(
     user_or_group, model_or_instance_or_queryset, perms, field_name=None
 ):
     """
@@ -119,6 +119,15 @@ def set_perms_shortcut(
     for s in perms.lower():
         permstr = get_permission_for_model(s, model, string=True, field_name=field_name)
         gs.assign_perm(permstr, user_or_group, obj=instance)
+
+
+@deprecated(details="use add_perms_shortcut(...) instead")
+def set_perms_shortcut(
+    user_or_group, model_or_instance_or_queryset, perms, field_name=None
+):
+    return add_perms_shortcut(
+        user_or_group, model_or_instance_or_queryset, perms, field_name
+    )
 
 
 def has_perms_shortcut(
