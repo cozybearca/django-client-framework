@@ -2,11 +2,12 @@ from logging import getLogger
 
 from django.utils.functional import cached_property
 from django_client_framework import exceptions as e
+from .serializer import Serializer
 
 LOG = getLogger(__name__)
 
 
-class DelegateSerializer:
+class DelegateSerializer(Serializer):
     """
     Any subclass can provide read, create, update delegate serializers dynamically.
     """
