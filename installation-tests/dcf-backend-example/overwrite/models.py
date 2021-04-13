@@ -1,6 +1,6 @@
 from django_client_framework.models import Serializable, AccessControlled
 from django_client_framework.serializers import ModelSerializer
-from django_client_framework.permissions import default_groups, set_perms_shortcut
+from django_client_framework.permissions import default_groups, add_perms_shortcut
 from django_client_framework.api import register_api_model
 from django.db.models import CharField, ForeignKey, CASCADE
 
@@ -15,7 +15,7 @@ class Brand(Serializable, AccessControlled):
 
     class PermissionManager(AccessControlled.PermissionManager):
         def add_perms(self, brand):
-            set_perms_shortcut(default_groups.anyone, brand, "r")
+            add_perms_shortcut(default_groups.anyone, brand, "r")
 
 
 class BrandSerializer(ModelSerializer):
@@ -35,7 +35,7 @@ class Product(Serializable, AccessControlled):
 
     class PermissionManager(AccessControlled.PermissionManager):
         def add_perms(self, product):
-            set_perms_shortcut(default_groups.anyone, product, "r")
+            add_perms_shortcut(default_groups.anyone, product, "r")
 
 
 class ProductSerializer(ModelSerializer):
