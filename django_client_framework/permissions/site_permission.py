@@ -56,12 +56,6 @@ def filter_queryset_by_perms_shortcut(perms, user_or_group, queryset, field_name
     specified by perms. If field_name is specified, additionally include objects
     that user_or_group has field permission on.
 
-    Warning: Different from has_perms_shortcut(), this function accounts for the
-    special "anyone" group. If a permission is set on the "anyone" group, then
-    filter_queryset_by_perms_shortcut() views any group or user has that
-    permission. On the other hand, has_perms_shortcut() ignores the "anyone"
-    group's permission.
-
     Algorithm:
         perms: rwcd \in {0,1}^4
         with/no field: f \in {0,1}
