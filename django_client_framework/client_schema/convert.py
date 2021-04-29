@@ -6,7 +6,7 @@ from django.db.models.fields.reverse_related import (
     ManyToOneRel,
     OneToOneRel,
 )
-from django_client_framework.serializers.base import generate_jsonschema
+from django_client_framework.serializers import generate_jsonschema
 from rest_framework import serializers
 from rest_framework.utils.field_mapping import ClassLookupDict
 
