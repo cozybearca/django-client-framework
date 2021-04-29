@@ -1,5 +1,6 @@
 from logging import getLogger
 
+from deprecation import deprecated
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -8,7 +9,7 @@ from django.db import transaction
 from django.db.models.base import ModelBase
 from guardian import models as gm
 from guardian import shortcuts as gs
-from deprecation import deprecated
+
 from . import default_groups
 
 LOG = getLogger(__name__)
@@ -57,9 +58,9 @@ def filter_queryset_by_perms_shortcut(perms, user_or_group, queryset, field_name
     that user_or_group has field permission on.
 
     Algorithm:
-        perms: rwcd \in {0,1}^4
-        with/no field: f \in {0,1}
-        normal/anyone user: u \in {0,1}
+        perms: rwcd in {0,1}^4
+        with/no field: f in {0,1}
+        normal/anyone user: u in {0,1}
         A0 = filter with rwcd mask, f=0
         A1 = filter with rwcd mask, f=1
         B0 = A0 union A1, g=0
