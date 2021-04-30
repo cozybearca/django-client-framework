@@ -39,7 +39,7 @@ class ApiPagination(PageNumberPagination):
 
 
 class BaseModelAPI(GenericAPIView):
-    """ base class for requests to /products or /products/1 """
+    """base class for requests to /products or /products/1"""
 
     pagination_class = ApiPagination
     models = []
