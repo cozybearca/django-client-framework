@@ -1,6 +1,6 @@
 .PHONY: ubuntu-base
 ubuntu-base:
-	docker-compose build dcf-test-ubuntu-base
+	docker-compose build dcf-install-test-ubuntu
 
 
 .PHONY: example
