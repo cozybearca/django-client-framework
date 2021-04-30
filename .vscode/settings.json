@@ -1,6 +1,11 @@
 {
-    "python.linting.pylintEnabled": false,
-    "python.linting.mypyEnabled": false,
-    "python.linting.flake8Enabled": true,
-    "python.linting.enabled": true
+  "python.linting.pylintEnabled": false,
+  "python.linting.mypyEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.enabled": true,
+  "python.analysis.extraPaths": [
+    "/home/yuli/django-client-framework/tests/",
+    "/home/yuli/django-client-framework",
+    "./unit-tests"
+  ]
 }
