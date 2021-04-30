@@ -1,13 +1,13 @@
 version: "3"
 services:
-  dcf-test-ubuntu-base:
+  dcf-install-test-ubuntu:
     build:
       context: .
       dockerfile: ubuntu-base.dockerfile
-    image: dcf-test-ubuntu-base
+    image: dcf-install-test-ubuntu
 
   dcf-test-example:
-    image: dcf-test-ubuntu-base
+    image: dcf-install-test-ubuntu
     volumes:
       - ./dcf-backend-example/overwrite:/_overwrite:ro
       - ./dcf-backend-example/entrypoint.py:/entrypoint.py:ro
@@ -16,7 +16,7 @@ services:
     command: ["python3", /entrypoint.py]
 
   dcf-test-example-ts:
-    image: dcf-test-ubuntu-base
+    image: dcf-install-test-ubuntu
     volumes:
       - ../:/django_client_framework:ro
       - ../clients/django-client-framework-typescript:/django-client-framework-typescript:ro
