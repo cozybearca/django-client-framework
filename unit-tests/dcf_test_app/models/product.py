@@ -13,7 +13,6 @@ LOG = logging.getLogger(__name__)
 
 @register_api_model
 class Product(Serializable, AccessControlled):
-
     barcode = m.CharField(max_length=255, blank=True, default="")
     brand = m.ForeignKey(
         Brand, null=True, on_delete=m.SET_NULL, related_name="products"
@@ -21,7 +20,8 @@ class Product(Serializable, AccessControlled):
 
     class PermissionManager(AccessControlled.PermissionManager):
         def add_perms(self, product):
-            set_perms_shortcut(default_groups.anyone, product, "r")
+            # set_perms_shortcut(default_groups.anyone, product, "r")
+            pass
 
     @classmethod
     def serializer_class(cls):

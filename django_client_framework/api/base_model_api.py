@@ -111,8 +111,9 @@ class BaseModelAPI(GenericAPIView):
         Support generic filtering, eg: /products?_order_by=name
         """
         by = self.request.query_params.getlist("_order_by", ["pk"])
+        by_arr = by[0].split(',')
         try:
-            return queryset.order_by(*by)
+            return queryset.order_by(*by_arr)
         except Exception as execpt:
             raise e.ValidationError(execpt)
 

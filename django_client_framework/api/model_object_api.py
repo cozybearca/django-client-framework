@@ -84,7 +84,23 @@ class ModelObjectAPI(BaseModelAPI):
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
-        return Response(serializer.data)
+        # return Response(serializer.data)
+        if p.has_perms_shortcut(self.user_object, instance, "r"):
+            return Response(
+                self.get_serializer(
+                    instance=instance,
+                    context={"request": request},
+                ).data,
+                status=201,
+            )
+        else:
+            return Response(
+                {
+                    "success": True,
+                    "info": "The object has been updated but you have no permission to view it.",
+                },
+                status=201,
+            )
 
     def delete(self, request, *args, **kwargs):
         if not p.has_perms_shortcut(self.user_object, self.model_object, "d"):

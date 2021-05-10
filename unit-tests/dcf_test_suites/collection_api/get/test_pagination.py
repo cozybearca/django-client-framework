@@ -19,36 +19,196 @@ class TestPagination(TestCase):
             for i in range(100)
         ]
 
-    def test_list(self):
-        resp = self.superuser_client.get("/product")
-        data = resp.json()
-        self.assertDictContainsSubset(
-            {"page": 1, "limit": 50, "total": 100},
-            data,
-        )
-        objects = data["objects"]
-        self.assertEqual(len(objects), 50)
-        self.assertDictContainsSubset(
-            objects[0], {"id": 1, "barcode": "product_1", "brand_id": 1}
-        )
-        self.assertDictContainsSubset(
-            objects[1],
-            {"id": 2, "barcode": "product_2", "brand_id": None},
-        )
+#     def test_list(self):
+#         resp = self.superuser_client.get("/product")
+#         data = resp.json()
+#         self.assertDictContainsSubset(
+#             {"page": 1, "limit": 50, "total": 100},
+#             data,
+#         )
+#         objects = data["objects"]
+#         self.assertEqual(len(objects), 50)
+#         self.assertDictContainsSubset(
+#             objects[0], {"id": 1, "barcode": "product_1", "brand_id": 1}
+#         )
+#         self.assertDictContainsSubset(
+#             objects[1],
+#             {"id": 2, "barcode": "product_2", "brand_id": None},
+#         )
 
-    def test_list_next_page(self):
-        resp = self.superuser_client.get("/product?_page=2")
-        data = resp.json()
-        self.assertDictContainsSubset(
-            {"page": 2, "limit": 50, "total": 100},
-            data,
-        )
-        objects = data["objects"]
-        self.assertEqual(len(objects), 50)
-        self.assertDictContainsSubset(
-            objects[0], {"id": 51, "barcode": "product_51", "brand_id": 51}
-        )
-        self.assertDictContainsSubset(
-            objects[1],
-            {"id": 52, "barcode": "product_52", "brand_id": None},
-        )
+
+#     def test_list_next_page(self):
+#         resp = self.superuser_client.get("/product?_page=2")
+#         data = resp.json()
+#         self.assertDictContainsSubset(
+#             {"page": 2, "limit": 50, "total": 100},
+#             data,
+#         )
+#         objects = data["objects"]
+#         self.assertEqual(len(objects), 50)
+#         self.assertDictContainsSubset(
+#             objects[0], {"id": 51, "barcode": "product_51", "brand_id": 51}
+#         )
+#         self.assertDictContainsSubset(
+#             objects[1],
+#             {"id": 52, "barcode": "product_52", "brand_id": None},
+#         )
+
+    
+#     def test_page_with_limit(self):
+#         resp = self.superuser_client.get("/product?_page=3&_limit=10")
+#         data = resp.json()
+#         objects = data['objects']
+#         self.assertDictContainsSubset(
+#             {"page": 3, "limit": 10, "total": 100},
+#             data
+#         )
+#         self.assertDictContainsSubset(
+#             objects[0],
+#             { "id": 21, "barcode": "product_21", "brand_id": 21 }
+#         )
+#         # print(data)
+
+
+#     def test_limit_without_page(self):
+#         resp = self.superuser_client.get("/product?_limit=10")
+#         data = resp.json()
+#         objects = data["objects"]
+        
+#         self.assertDictContainsSubset(
+#             {"page": 1, "limit": 10, "total": 100},
+#             data
+#         )
+#         self.assertEqual(len(objects), 10)
+#         self.assertDictContainsSubset(
+#             objects[2], 
+#             {"id": 3, "barcode": "product_3", "brand_id": 3}
+#         )
+
+#     def test_key_name_single(self):
+#         resp = self.superuser_client.get("/product?barcode__exact=product_21")
+#         data = resp.json()
+#         objects = data["objects"]
+#         self.assertDictContainsSubset({"page": 1, "limit": 50, "total": 1}, data)
+#         self.assertEqual(len(objects), 1)
+#         self.assertDictContainsSubset(
+#             objects[0],
+#             {"id": 21, "barcode": "product_21", "brand_id": 21}
+#         )
+
+#     def test_key_name_multiple_has_result(self):
+#         resp = self.superuser_client.get("/product?barcode__exact=product_100&id__exact=100")
+#         data = resp.json()
+#         objects = data["objects"]
+#         self.assertDictContainsSubset({"page": 1, "limit": 50, "total": 1}, data)
+#         self.assertEqual(len(objects), 1)
+#         self.assertDictContainsSubset(
+#             objects[0],
+#             {"id": 100, "barcode": "product_100", "brand_id": None}
+#         )
+    
+#     def test_key_name_multiple_not_has_result(self):
+#         resp = self.superuser_client.get("/product?barcode__exact=product_21&id__exact=20")
+#         data = resp.json()
+#         objects = data["objects"]
+#         self.assertDictContainsSubset({"page": 1, "limit": 50, "total": 0}, data)
+#         self.assertEqual(len(objects), 0)
+
+
+#     def test_extend_past_page(self):
+#         resp = self.superuser_client.get("/product?_page=4")
+#         data = resp.json()
+#         self.assertDictEqual({"detail": "Invalid page."}, data)
+
+    
+#     def test_extend_past_page_with_limit(self):
+#         resp = self.superuser_client.get("/product?_limit=40&_page=4")
+#         data = resp.json()
+#         self.assertDictEqual({"detail": "Invalid page."}, data)
+
+
+#     def test_key_name_array_filled_empty(self):
+#         resp = self.superuser_client.get("/product?barcode__in[]=product_121&barcode__in[]=product_122")
+#         data = resp.json()
+#         objects = data["objects"]
+#         self.assertDictContainsSubset({"page": 1, "limit": 50, "total": 0 }, data)
+#         self.assertEqual(len(data['objects']), 0)
+
+#     def test_key_name_array(self):
+#         resp = self.superuser_client.get("/product?barcode__in[]=product_21&barcode__in[]=product_22")
+#         data = resp.json()
+#         objects = data["objects"]
+#         self.assertDictContainsSubset({"page": 1, "limit": 50, "total": 2}, data)
+#         self.assertEqual(len(data['objects']), 2)
+#         self.assertIn({"id": 21, "barcode": "product_21", "brand_id": 21}, objects)
+
+#     def test_invalid_key(self):
+#         resp = self.superuser_client.get("/product?bracode=product_21")
+#         # print(resp)
+#         self.assertEqual(400, resp.status_code)
+
+#     # def key_name_array_with_page_and_limit(self):
+#         # maybe error: ordering is 22 -> 21 and not 21 -> 22
+#         # resp = self.superuser_client.get("/product?barcode__in[]=product_21&barcode__in[]=product_22&_limit=1&_page=2")
+#         # data = resp.json()
+#         # self.assertDictContainsSubset({"page": 2, "limit": 1, "total": 2}, data)
+#         # self.assertEqual(len(data["objects"]), 1)
+#         # self.assertEquals(data["objects"][0]["barcode"], "product_21")
+
+#     def test_positive_order(self):
+#         resp = self.superuser_client.get("/product?_order_by=barcode")
+#         data = resp.json()
+#         objects = data['objects']
+#         self.assertDictContainsSubset(
+#             {"page": 1, "limit": 50, "total": 100},
+#             data
+#         )
+#         self.assertDictContainsSubset(
+#             objects[0],
+#             { "id": 1, "barcode": "product_1", "brand_id": 1 }
+#         )
+#         self.assertDictContainsSubset(
+#             objects[2],
+#             { "id": 100, "barcode": "product_100", "brand_id": None }
+#         )
+
+#     def test_negative_order(self):
+#         resp = self.superuser_client.get("/product?_order_by=-barcode&_page=2")
+#         data = resp.json()
+#         objects = data['objects']
+#         self.assertDictContainsSubset(
+#             {"page": 2, "limit": 50, "total": 100},
+#             data
+#         )
+#         self.assertDictContainsSubset(
+#             objects[0],
+#             { "id": 53, "barcode": "product_53", "brand_id": 53 }
+#         )
+#         self.assertDictContainsSubset(
+#             objects[1],
+#             { "id": 52, "barcode": "product_52", "brand_id": None }
+#         )
+    
+
+    # def test_order_multiple_keys(self):
+    #     resp = self.superuser_client.get("/product", {"_order_by": "-barcode,id", "_page": 2})
+    #     print(resp)
+    #     data = resp.json()
+    #     objects = data['objects']
+    #     self.assertDictContainsSubset(
+    #         {"page": 2, "limit": 50, "total": 100},
+    #         data
+    #     )
+    #     self.assertDictContainsSubset(
+    #         objects[0],
+    #         { "id": 53, "barcode": "product_53", "brand_id": 53 }
+    #     )
+    #     self.assertDictContainsSubset(
+    #         objects[1],
+    #         { "id": 52, "barcode": "product_52", "brand_id": None }
+    #     )
+    
+
+#     def test_order_malformed(self):
+#         resp = self.superuser_client.get("/product?_order_by=bracode")
+#         self.assertEquals(400, resp.status_code)

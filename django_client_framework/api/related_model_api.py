@@ -21,9 +21,9 @@ class RelatedModelAPI(BaseModelAPI):
     @property
     def allowed_methods(self):
         if isinstance(self.field, ForeignKey):
-            return ["GET"]
+            return ["GET", "PATCH"]
         else:
-            return ["GET", "DELETE", "POST", "PUT"]
+            return ["GET", "DELETE", "POST", "PATCH"]
 
     @cached_property
     def __body_pk_ls(self):
@@ -44,8 +44,9 @@ class RelatedModelAPI(BaseModelAPI):
             )
 
     def __check_write_perm_on_rel_objects(self, queryset=None):
-        filtered = p.filter_queryset_by_perms_shortcut("w", self.user_object, queryset)
+        filtered = p.filter_queryset_by_perms_shortcut("w", self.user_object, queryset, self.reverse_field_name)
         no_write = queryset.difference(filtered).values_list("pk")
+
         if no_write:
             has_read = p.filter_queryset_by_perms_shortcut(
                 "r", self.user_object, queryset.model.objects.filter(pk__in=no_write)
@@ -88,12 +89,15 @@ class RelatedModelAPI(BaseModelAPI):
                 [obj.cached_serialized_data for obj in page]
             )
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):    
         self.__check_perm_on_field(self.model_object, "w", self.field_name)
         self.__check_write_perm_on_rel_objects(
             self.field_model.objects.filter(pk__in=self.__body_pk_ls)
         )
-        self.field_val.add(*self.__body_pk_ls)
+        
+        selected = list(self.field_model.objects.filter(id__in=self.__body_pk_ls))
+        for selected_product in selected:
+            self.field_val.add(selected_product)
         return self.__return_get_result_if_permitted(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
@@ -106,6 +110,25 @@ class RelatedModelAPI(BaseModelAPI):
         self.field_val.set(objects)
         return self.__return_get_result_if_permitted(request, *args, **kwargs)
 
+    def patch(self, request, *args, **kwargs):
+        self.__check_perm_on_field(self.model_object, "w", self.field_name)
+        self.__check_write_perm_on_rel_objects(
+            self.field_model.objects.filter(pk__in=self.__body_pk_ls)
+        )
+        if isinstance(self.field, ManyToOneRel):
+            self.__check_write_perm_on_rel_objects(queryset=self.field_val.all())
+            selected = list(self.field_model.objects.filter(id__in=self.__body_pk_ls))
+            self.field_val.set(selected)
+        else:
+            self.__check_write_perm_on_rel_objects(
+                self.field_model.objects.filter(pk__in=[self.field_val.id])
+            )
+            # assuming there is only one id passed because this is OneToOne not ManyToOne Rel
+            new_val = list(self.field_model.objects.filter(pk__in=self.__body_pk_ls))[0]
+            setattr(self.model_object, self.field_name, new_val)
+            self.model_object.save()
+        return self.__return_get_result_if_permitted(request, *args, **kwargs)
+
     def delete(self, request, *args, **kwargs):
         self.__check_perm_on_field(self.model_object, "w", self.field_name)
         self.__check_write_perm_on_rel_objects(
@@ -116,7 +139,12 @@ class RelatedModelAPI(BaseModelAPI):
                 f"Cannot remove {self.field_name} from {self.model.__name__} due to non-null constraints."
                 " Did you mean to delete the object directly?"
             )
-        self.field_val.remove(*self.__body_pk_ls)
+        selected = list(self.field_model.objects.filter(id__in=self.__body_pk_ls))
+        for selected_product in selected:
+            try:
+                self.field_val.remove(selected_product)
+            except:
+                continue
         return self.__return_get_result_if_permitted(request, *args, **kwargs)
 
     @cached_property
@@ -176,6 +204,15 @@ class RelatedModelAPI(BaseModelAPI):
     @cached_property
     def field_model(self):
         return self.field.related_model
+
+    @cached_property
+    def reverse_field_name(self):
+        if isinstance(self.field, ManyToOneRel):
+            temp = getattr(self.model, self.field_name)
+            return temp.rel.remote_field.name
+        else:
+            temp = getattr(self.model, self.field_name)
+            return temp.field.related_query_name()
 
     @overrides(GenericAPIView)
     def get_serializer_class(self):

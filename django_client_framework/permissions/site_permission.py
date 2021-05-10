@@ -89,7 +89,7 @@ def filter_queryset_by_perms_shortcut(perms, user_or_group, queryset, field_name
 
 def add_perms_shortcut(
     user_or_group, model_or_instance_or_queryset, perms, field_name=None
-):
+):  
     """
     Adds model or object permission depending on whether model_or_instance_or_queryset
     is a model.
@@ -109,7 +109,6 @@ def add_perms_shortcut(
         raise TypeError(
             f"model_or_instance_or_queryset has wrong type: {type(model_or_instance_or_queryset)}"
         )
-
     for s in perms.lower():
         permstr = get_permission_for_model(s, model, string=True, field_name=field_name)
         gs.assign_perm(permstr, user_or_group, obj=instance)
@@ -118,7 +117,7 @@ def add_perms_shortcut(
 @deprecated(details="use add_perms_shortcut(...) instead")
 def set_perms_shortcut(
     user_or_group, model_or_instance_or_queryset, perms, field_name=None
-):
+):  
     return add_perms_shortcut(
         user_or_group, model_or_instance_or_queryset, perms, field_name
     )
