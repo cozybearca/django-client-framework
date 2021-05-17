@@ -37,6 +37,10 @@ class ModelObjectAPI(BaseModelAPI):
     def patch(self, request, *args, **kwargs):
         # permission check deferred to .perform_update()
         instance = self.model_object
+        has_read_permissions = False
+        if p.has_perms_shortcut(self.user_object, instance, "r"):
+            has_read_permissions = True
+
         serializer = self.get_serializer(instance, data=self.request_data, partial=True)
         if not serializer.is_valid(raise_exception=True):
             raise e.ValidationError("Validation Error")
@@ -85,6 +89,8 @@ class ModelObjectAPI(BaseModelAPI):
             instance._prefetched_objects_cache = {}
 
         # return Response(serializer.data)
+        if has_read_permissions:
+            p.add_perms_shortcut(self.user_object, instance, "r")
         if p.has_perms_shortcut(self.user_object, instance, "r"):
             return Response(
                 self.get_serializer(

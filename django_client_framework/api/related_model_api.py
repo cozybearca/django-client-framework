@@ -59,7 +59,7 @@ class RelatedModelAPI(BaseModelAPI):
                 raise e.NotFound()
 
     def __return_get_result_if_permitted(self, request, *args, **kwargs):
-        if p.has_perms_shortcut(self.user_object, self.model_object, "r"):
+        if p.has_perms_shortcut(self.user_object, self.model_object, "r", field_name=self.field_name):
             return self.get(request, *args, **kwargs)
         else:
             return Response({"success": True})
@@ -115,6 +115,7 @@ class RelatedModelAPI(BaseModelAPI):
         self.__check_write_perm_on_rel_objects(
             self.field_model.objects.filter(pk__in=self.__body_pk_ls)
         )
+        temp = getattr(self.model, self.field_name)
         if isinstance(self.field, ManyToOneRel):
             self.__check_write_perm_on_rel_objects(queryset=self.field_val.all())
             selected = list(self.field_model.objects.filter(id__in=self.__body_pk_ls))
@@ -123,10 +124,27 @@ class RelatedModelAPI(BaseModelAPI):
             self.__check_write_perm_on_rel_objects(
                 self.field_model.objects.filter(pk__in=[self.field_val.id])
             )
-            # assuming there is only one id passed because this is OneToOne not ManyToOne Rel
-            new_val = list(self.field_model.objects.filter(pk__in=self.__body_pk_ls))[0]
-            setattr(self.model_object, self.field_name, new_val)
-            self.model_object.save()
+            
+            has_read_perm = False
+            if p.has_perms_shortcut(self.user_object, self.model_object, "r", self.field_name):
+                has_read_perm = True
+            
+            new_val_lst = list(self.field_model.objects.filter(pk__in=self.__body_pk_ls))
+            if len(self.__body_pk_ls) != 1:
+                return Response(status=400, data={"input_error": 'You must input exactly one id'})
+            
+            if len(new_val_lst) == 1:
+                new_val = new_val_lst[0]
+                setattr(self.model_object, self.field_name, new_val)
+                self.model_object.save()
+                if has_read_perm:
+                    # resetting perm because apparently calling self.model_object.save() removes all its
+                    # perms 
+                    p.add_perms_shortcut(self.user_object, self.model_object, "r", self.field_name)
+                    self.field_val = new_val
+            elif len(new_val_lst) == 0:
+                return Response(status=400, data={"brand_id": 'Invalid pk \"{}\" - object does not exist.'.format(self.__body_pk_ls[0])})
+            
         return self.__return_get_result_if_permitted(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
