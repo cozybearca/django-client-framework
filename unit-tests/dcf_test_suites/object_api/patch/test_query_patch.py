@@ -19,30 +19,31 @@ class TestQuery(TestCase):
             for i in range(2)
         ]
 
-
     def test_patch_successful(self):
         resp = self.superuser_client.patch(
-            "/product/1",
-            { "barcode": "product_11", "brand_id": 2 }
+            "/product/1", {"barcode": "product_11", "brand_id": 2}
         )
         data = resp.json()
-        self.assertDictEqual(data, { "id": 1, "barcode": "product_11", "brand_id": 2 }) 
+        self.assertDictEqual(data, {"id": 1, "barcode": "product_11", "brand_id": 2})
         self.assertEqual(Product.objects.get(id=1).barcode, "product_11")
-
 
     def test_patch_invalid_fk(self):
         resp = self.superuser_client.patch(
-            "/product/1",
-            { "barcode": "product_11", "brand_id": 3 }
+            "/product/1", {"barcode": "product_11", "brand_id": 3}
         )
         data = resp.json()
-        self.assertDictEqual(data, {'brand_id': 'Invalid pk "3" - object does not exist.'})
+        self.assertDictEqual(
+            data, {"brand_id": 'Invalid pk "3" - object does not exist.'}
+        )
 
-    
     def test_patch_invalid_keys(self):
         resp = self.superuser_client.patch(
-            "/product/1", 
-            { "barcodee": "product_2", "brand_id": 2 }
+            "/product/1", {"barcodee": "product_2", "brand_id": 2}
         )
         data = resp.json()
-        self.assertDictEqual( data, { "non_field_error": "Extra fields are not allowed: ['barcodee'], valid fields are: ['barcode', 'brand_id']" })
+        self.assertDictEqual(
+            data,
+            {
+                "non_field_error": "Extra fields are not allowed: ['barcodee'], valid fields are: ['barcode', 'brand_id']"
+            },
+        )

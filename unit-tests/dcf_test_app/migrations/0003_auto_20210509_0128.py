@@ -7,22 +7,46 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dcf_test_app', '0002_user'),
+        ("dcf_test_app", "0002_user"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ThirdParty',
+            name="ThirdParty",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('brand', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='tps', to='dcf_test_app.brand')),
-                ('product', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='tps', to='dcf_test_app.product')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "brand",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="tps",
+                        to="dcf_test_app.brand",
+                    ),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="tps",
+                        to="dcf_test_app.product",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.DeleteModel(
-            name='User',
+            name="User",
         ),
     ]

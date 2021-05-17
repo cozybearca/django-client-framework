@@ -16,24 +16,20 @@ class TestGetPerms(TestCase):
         self.pr1 = Product.objects.create(barcode="pr1", brand=self.br1)
         self.pr2 = Product.objects.create(barcode="pr2", brand=self.br2)
         p.clear_permissions()
-    
 
     def test_get_without_permissions(self):
         resp = self.user_client.get("/product/1")
         self.assertEquals(404, resp.status_code)
-    
 
     def test_get_incorrect_permissions(self):
         p.set_perms_shortcut(self.user, Product, "wcd")
         resp = self.user_client.get("/product/1")
         self.assertEquals(404, resp.status_code)
 
-
     def test_get_incorrect_permissions_ver_2(self):
         p.set_perms_shortcut(self.user, Product, "r", field_name="barcode")
         resp = self.user_client.get("/product/1")
         self.assertEquals(404, resp.status_code)
-
 
     def test_get_correct_permissions(self):
         p.set_perms_shortcut(self.user, Product, "r")

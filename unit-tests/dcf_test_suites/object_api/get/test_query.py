@@ -24,7 +24,6 @@ class TestQuery(TestCase):
         data = resp.json()
         self.assertDictEqual(data, {"id": 1, "barcode": "product_1", "brand_id": 1})
 
-    
     def test_get_2(self):
         resp = self.superuser_client.get("/product/2")
         data = resp.json()

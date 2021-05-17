@@ -9,3 +9,6 @@ alpine-base:
 .PHONY: sh
 sh: alpine-base
 	docker-compose run --entrypoint sh dcf-test-alpine
+
+%: Makefile
+	docker-compose run --rm dcf-test-alpine test -v2 $@

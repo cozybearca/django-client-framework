@@ -19,7 +19,7 @@ class TestRetrieve(TestCase):
         resp = self.superuser_client.get("/product/1/brand")
         data = resp.json()
         self.assertDictEqual(data, {"id": 1, "name": "brand"})
-    
+
     def test_get_failed(self):
         resp = self.superuser_client.get("/product/2/brand")
         self.assertEqual(resp.status_code, 404)
