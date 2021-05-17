@@ -1,4 +1,5 @@
 from django.test import TestCase
+from rest_framework.response import Response
 from rest_framework.test import APIClient
 from django.contrib.auth import get_user_model
 from dcf_test_app.models import Product
@@ -36,7 +37,9 @@ class TestDelete(TestCase):
         resp = self.superuser_client.delete(
             "/brand/1/products", data=[101, 102], content_type="application/json"
         )
-        self.assertEquals(50, len(resp.json()["objects"]))
+        data = resp.json()
+        self.assertEquals(resp.status_code, 200, msg=str(data))
+        self.assertEquals(50, len(data["objects"]), msg=str(data))
         self.assertTrue(Product.objects.get(id=101).brand_id == 2)
         self.assertTrue(Product.objects.get(id=102).brand_id == 2)
         self.assertTrue(Product.objects.filter(brand_id=1).count() == 100)

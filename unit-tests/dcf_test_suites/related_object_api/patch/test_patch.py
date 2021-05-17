@@ -21,22 +21,25 @@ class TestRetrieve(TestCase):
 
     def test_patch_success(self):
         self.superuser_client.patch(
-            "/product/1/brand", data=[2], content_type="application/json"
+            "/product/1/brand", data=2, content_type="application/json"
         )
         self.assertEqual(2, Product.objects.get(id=1).brand_id)
 
     def test_patch_failed_invalid_fk(self):
         resp = self.superuser_client.patch(
-            "/product/1/brand", data=[23], content_type="application/json"
+            "/product/1/brand", data=23, content_type="application/json"
         )
         data = resp.json()
-        self.assertDictEqual(
-            data, {"brand_id": 'Invalid pk "23" - object does not exist.'}
-        )
+        self.assertDictEqual(data, {"detail": "Not Found: Brand (23)"})
 
     def test_patch_failed_multiple_ids(self):
         resp = self.superuser_client.patch(
             "/product/1/brand", data=[23, 24], content_type="application/json"
         )
         data = resp.json()
-        self.assertDictEqual(data, {"input_error": "You must input exactly one id"})
+        self.assertDictEqual(
+            data,
+            {
+                "non_field_error": "Expected an object pk in the request body, but received list: [23, 24]"
+            },
+        )

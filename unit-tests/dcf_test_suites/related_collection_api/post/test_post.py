@@ -35,13 +35,12 @@ class TestPost(TestCase):
         resp = self.superuser_client.post(
             "/brand/1/products", data=[160, 170], content_type="application/json"
         )
-        self.assertEquals(50, len(resp.json()["objects"]))
-        self.assertEqual(Product.objects.filter(brand_id=1).count(), 100)
+        self.assertEqual(resp.status_code, 404)
+        self.assertFalse(Brand.objects.filter(products__in=[160, 170]).exists())
 
     def test_post_related_partial_failure(self):
         resp = self.superuser_client.post(
             "/brand/1/products", data=[103, 180], content_type="application/json"
         )
-        self.assertEquals(50, len(resp.json()["objects"]))
-        self.assertEqual(Product.objects.filter(brand_id=1).count(), 101)
-        self.assertEqual(Product.objects.get(barcode="product_103").brand_id, 1)
+        self.assertEqual(resp.status_code, 404)
+        self.assertFalse(Brand.objects.filter(products=180).exists())

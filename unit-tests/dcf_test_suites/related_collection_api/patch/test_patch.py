@@ -44,5 +44,5 @@ class TestPatch(TestCase):
         resp = self.superuser_client.patch(
             "/brand/1/products", data=[200], content_type="application/json"
         )
-        self.assertEquals(len(resp.json()["objects"]), 0)
-        self.assertEquals(0, Product.objects.filter(brand_id=1).count())
+        self.assertEqual(resp.status_code, 404)
+        self.assertEquals(0, Product.objects.filter(brand_id=200).count())
