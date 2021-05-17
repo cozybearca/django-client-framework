@@ -134,3 +134,4 @@ node_modules/
 *.tz
 
 _out/
+.DS_Store
