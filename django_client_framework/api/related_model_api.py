@@ -16,7 +16,7 @@ LOG = getLogger(__name__)
 
 
 class RelatedModelAPI(BaseModelAPI):
-    """ handle requests such as GET/POST/PUT /products/1/images """
+    """handle requests such as GET/POST/PUT /products/1/images"""
 
     @property
     def allowed_methods(self):

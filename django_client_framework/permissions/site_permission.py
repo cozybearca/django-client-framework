@@ -51,7 +51,7 @@ def get_permission_for_model(
 
 
 def filter_queryset_by_perms_shortcut(perms, user_or_group, queryset, field_name=None):
-    """
+    r"""
     Filters queryset by keeping objects that user_or_group has all permissions
     specified by perms. If field_name is specified, additionally include objects
     that user_or_group has field permission on.
