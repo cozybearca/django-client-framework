@@ -15,6 +15,9 @@ jobs:
           echo "whoami: $(whoami)"
           echo "pwd: $(pwd)"
 
+      - name: Change work directory permission
+        run: sudo chown -R $(whoami):$(whoami) .
+
       - name: Run git checkout
         uses: actions/checkout@v2
         with:
@@ -25,12 +28,38 @@ jobs:
 
       - name: Set up env vars
         run: |
-          .github/workflows/set_env
-          .github/workflows/set_env -w
+          .github/workflows/set_env.py
+          .github/workflows/set_env.py -w
 
-      - name: Create Pull Request
-        uses: repo-sync/pull-request@v2
+      - name: Install SDK
+        run: |
+          sudo -E .github/workflows/installation.py
+
+      - name: Login Docker
+        run: |
+          docker login docker.pkg.github.com -u ${GITHUB_ACTOR} --password-stdin <<< ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cancel Previous Runs
+        if: env.IS_DEV_BRANCH == 'True'
+        uses: styfle/cancel-workflow-action@0.4.1
         with:
-          destination_branch: "main"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_title: "main <- ${BRANCH_NAME}: ${COMMIT_TITLE}"
+          access_token: ${{ github.token }}
+
+      - name: Create PR
+        if: env.IS_DEV_BRANCH == 'True' || env.BRANCH_NAME == 'staging'
+        run: |
+          gh auth login --with-token <<< "${{ github.token }}"
+          gh pr create --title "${TARGET_BRANCH} <- ${BRANCH_NAME}: ${COMMIT_TITLE}" --base ${TARGET_BRANCH} --body "${PR_BODY}" || true # ignore PR already exists error
+
+      - name: Run style check
+        run: |
+          ./bin/checkstyle.py
+
+      - name: Run tests
+        run: |
+          echo run tests
+
+      - name: Shutdown
+        if: always()
+        run: |
+          echo shutdown

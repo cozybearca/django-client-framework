@@ -1,8 +1,6 @@
-from subprocess import Popen, run, SubprocessError
+from subprocess import Popen, run
 from pathlib import Path
 import shutil
-import os
-import json
 import unittest
 
 PROJ = Path("/_out")
