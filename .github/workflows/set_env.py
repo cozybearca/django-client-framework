@@ -4,6 +4,8 @@ import os
 from subprocess import CalledProcessError, run
 from typing import Dict, List
 
+import click
+
 
 def github_repo_name():
     return os.environ["GITHUB_REPOSITORY"].split("/")[1]
@@ -62,6 +64,29 @@ def should_upload_package() -> bool:
     return (ci_yaml_changed() and is_dev_branch()) or git_branch_name() == "release"
 
 
+def flutter_path() -> str:
+    return "/opt/flutter"
+
+
+def overwrite_path() -> str:
+    return ":".join(
+        [
+            os.environ["PATH"],
+            "/usr/local/bin/",
+            "/home/runner/.local/bin/",
+            f"{flutter_path()}/bin",
+        ]
+    )
+
+
+def pr_body() -> str:
+    if target_branch() == "staging":
+        return 'To merge into the staging branch, please use "Rebase and merge", or "Squash and merge".'
+    elif target_branch == "release":
+        return 'To merge into the release branch, please use "Create a merge commit".'
+    return ""
+
+
 def get_env() -> Dict[str, str]:
     return {
         "PROJECT_NAME": github_repo_name(),
@@ -72,9 +97,14 @@ def get_env() -> Dict[str, str]:
         "TARGET_BRANCH": target_branch(),
         "COMMIT_TITLE": git_commit_title(),
         "SHOULD_UPLOAD_PACKAGE": should_upload_package(),
+        "FLUTTER_PATH": flutter_path(),
+        "PATH": overwrite_path(),
+        "PR_BODY": pr_body(),
     }
 
 
+@click.command()
+@click.option("-w", "--write", is_flag=True)
 def main(write):
     content = ""
     for key, val in get_env().items():
@@ -88,7 +118,6 @@ def main(write):
 
 if __name__ == "__main__":
     try:
-        main(write=False)
-        main(write=True)
+        main()
     except CalledProcessError as err:
         exit(err.stdout + err.stderr)
