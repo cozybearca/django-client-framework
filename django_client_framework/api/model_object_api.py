@@ -13,7 +13,7 @@ LOG = getLogger(__name__)
 
 
 class ModelObjectAPI(BaseModelAPI):
-    """ handle requests such as GET/DELETE/PATCH /products/1 """
+    """handle requests such as GET/DELETE/PATCH /products/1"""
 
     allowed_methods = ["GET", "DELETE", "PATCH"]
 
