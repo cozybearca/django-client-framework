@@ -12,7 +12,7 @@ LOG = getLogger(__name__)
 
 
 class ModelCollectionAPI(BaseModelAPI):
-    """ handle request such as GET/POST /products """
+    """handle request such as GET/POST /products"""
 
     allowed_methods = ["GET", "POST"]
 
