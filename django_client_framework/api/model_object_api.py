@@ -7,7 +7,7 @@ from django_client_framework import permissions as p
 from ipromise import overrides
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .base_model_api import BaseModelAPI
+from .base_model_api import APIPermissionDenied, BaseModelAPI
 
 LOG = getLogger(__name__)
 
@@ -27,7 +27,7 @@ class ModelObjectAPI(BaseModelAPI):
 
     def get(self, request, *args, **kwargs):
         if not p.has_perms_shortcut(self.user_object, self.model_object, "r"):
-            self._deny_permission("r", self.model_object)
+            raise APIPermissionDenied(self.model_object, "r")
         serializer = self.get_serializer(
             self.model_object,
             context={"request": request},
@@ -37,6 +37,10 @@ class ModelObjectAPI(BaseModelAPI):
     def patch(self, request, *args, **kwargs):
         # permission check deferred to .perform_update()
         instance = self.model_object
+        has_read_permissions = False
+        if p.has_perms_shortcut(self.user_object, instance, "r"):
+            has_read_permissions = True
+
         serializer = self.get_serializer(instance, data=self.request_data, partial=True)
         if not serializer.is_valid(raise_exception=True):
             raise e.ValidationError("Validation Error")
@@ -49,7 +53,7 @@ class ModelObjectAPI(BaseModelAPI):
             if not p.has_perms_shortcut(
                 self.user_object, self.model_object, "w", field_name
             ):
-                self._deny_permission("w", self.model_object, field_name)
+                raise APIPermissionDenied(self.model_object, "w", field=field_name)
             if isinstance(field, ForeignKey):
                 old_related_obj = getattr(self.model_object, field_name, None)
                 new_related_obj = field_val
@@ -84,11 +88,29 @@ class ModelObjectAPI(BaseModelAPI):
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
-        return Response(serializer.data)
+        # return Response(serializer.data)
+        if has_read_permissions:
+            p.add_perms_shortcut(self.user_object, instance, "r")
+        if p.has_perms_shortcut(self.user_object, instance, "r"):
+            return Response(
+                self.get_serializer(
+                    instance=instance,
+                    context={"request": request},
+                ).data,
+                status=201,
+            )
+        else:
+            return Response(
+                {
+                    "success": True,
+                    "info": "The object has been updated but you have no permission to view it.",
+                },
+                status=201,
+            )
 
     def delete(self, request, *args, **kwargs):
         if not p.has_perms_shortcut(self.user_object, self.model_object, "d"):
-            self._deny_permission("d", self.model_object)
+            raise APIPermissionDenied(self.model_object, "d")
         try:
             if hasattr(self.get_serializer_class(), "delete"):
                 serializer = self.get_serializer(

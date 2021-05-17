@@ -57,7 +57,8 @@ jobs:
 
       - name: Run tests
         run: |
-          echo run tests
+          (cd ./installation-tests && make) &&\
+          (cd ./unit-tests && make)
 
       - name: Shutdown
         if: always()

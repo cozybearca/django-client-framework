@@ -6,7 +6,7 @@ from django_client_framework import permissions as p
 from ipromise import overrides
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .base_model_api import BaseModelAPI
+from .base_model_api import BaseModelAPI, APIPermissionDenied
 
 LOG = getLogger(__name__)
 
@@ -41,7 +41,7 @@ class ModelCollectionAPI(BaseModelAPI):
                 if not p.has_perms_shortcut(
                     self.user_object, field_instance, "w", field_name=related_name
                 ):
-                    self._deny_permission("w", field_instance, related_name)
+                    raise APIPermissionDenied(field_instance, "w", field=related_name)
 
         instance = serializer.save()
         if p.has_perms_shortcut(self.user_object, instance, "r"):

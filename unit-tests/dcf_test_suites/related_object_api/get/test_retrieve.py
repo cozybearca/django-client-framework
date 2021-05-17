@@ -13,8 +13,13 @@ class TestRetrieve(TestCase):
         self.superuser_client.force_authenticate(self.superuser)
         self.brand = Brand.objects.create(name="brand")
         self.product = Product.objects.create(barcode="product", brand=self.brand)
+        self.br2 = Brand.objects.create(name="nike")
 
     def test_get(self):
         resp = self.superuser_client.get("/product/1/brand")
         data = resp.json()
         self.assertDictEqual(data, {"id": 1, "name": "brand"})
+
+    def test_get_failed(self):
+        resp = self.superuser_client.get("/product/2/brand")
+        self.assertEqual(resp.status_code, 404)

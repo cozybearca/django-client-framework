@@ -109,7 +109,6 @@ def add_perms_shortcut(
         raise TypeError(
             f"model_or_instance_or_queryset has wrong type: {type(model_or_instance_or_queryset)}"
         )
-
     for s in perms.lower():
         permstr = get_permission_for_model(s, model, string=True, field_name=field_name)
         gs.assign_perm(permstr, user_or_group, obj=instance)
@@ -124,14 +123,11 @@ def set_perms_shortcut(
     )
 
 
-def has_perms_shortcut(
-    user_or_group, model_or_instance, perms, field_name=None, field=None
-):
+def has_perms_shortcut(user_or_group, model_or_instance, perms, field_name=None):
     """
-    Check if user has all permissions indicated by perms. If field_name is provided,
-    then checks wheather user has permission on that field. model permission implies
-    object permission implies field permission. Permission check is permissive. Returns
-    True as long as one of model or object permission is permitted.
+    Check if user has all permissions as indicated by perms. For example, when
+    perms="rw", returns True only if the user has both read and write
+    permissions. Model permission > object permission > field permission.
     """
     User = get_user_model()
 
@@ -143,9 +139,6 @@ def has_perms_shortcut(
         model = model_or_instance
     else:
         raise TypeError(f"model_or_instance has wrong type: {type(model_or_instance)}")
-
-    if field:
-        field_name = field.name
 
     if isinstance(user_or_group, User) and user_or_group.is_superuser:
         return True
