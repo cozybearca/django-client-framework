@@ -2,7 +2,7 @@ import logging
 
 from django_client_framework import models as m
 from django_client_framework.api import register_api_model
-from django_client_framework.models import AccessControlled, Serializable
+from django_client_framework.models import Serializable
 from django_client_framework.serializers import ModelSerializer
 
 from .brand import Brand
@@ -11,16 +11,11 @@ LOG = logging.getLogger(__name__)
 
 
 @register_api_model
-class Product(Serializable, AccessControlled):
+class Product(Serializable):
     barcode = m.CharField(max_length=255, blank=True, default="")
     brand = m.ForeignKey(
         Brand, null=True, on_delete=m.SET_NULL, related_name="products"
     )
-
-    class PermissionManager(AccessControlled.PermissionManager):
-        def add_perms(self, product):
-            # set_perms_shortcut(default_groups.anyone, product, "r")
-            pass
 
     @classmethod
     def serializer_class(cls):

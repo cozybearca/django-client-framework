@@ -1,4 +1,5 @@
 from logging import getLogger
+from django.db.models import Model
 
 from django.db.models.fields import related_descriptors
 from django.db.models.fields.related import ForeignKey, ManyToManyField
@@ -98,10 +99,8 @@ class RelatedModelAPI(BaseModelAPI):
         self.__check_write_perm_on_rel_objects(
             self.field_model.objects.filter(pk__in=self.__body_pk_ls)
         )
-
-        selected = list(self.field_model.objects.filter(id__in=self.__body_pk_ls))
-        for selected_product in selected:
-            self.field_val.add(selected_product)
+        selected_products = self.field_model.objects.filter(id__in=self.__body_pk_ls)
+        self.field_val.add(*selected_products)
         return self.__return_get_result_if_permitted(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
@@ -121,7 +120,7 @@ class RelatedModelAPI(BaseModelAPI):
         )
         if isinstance(self.field, ManyToOneRel):
             self.__check_write_perm_on_rel_objects(queryset=self.field_val.all())
-            selected = list(self.field_model.objects.filter(id__in=self.__body_pk_ls))
+            selected = self.field_model.objects.filter(id__in=self.__body_pk_ls)
             self.field_val.set(selected)
         else:
             self.__check_write_perm_on_rel_objects(
@@ -134,9 +133,7 @@ class RelatedModelAPI(BaseModelAPI):
             ):
                 has_read_perm = True
 
-            new_val_lst = list(
-                self.field_model.objects.filter(pk__in=self.__body_pk_ls)
-            )
+            new_val_lst = self.field_model.objects.filter(pk__in=self.__body_pk_ls)
             if len(self.__body_pk_ls) != 1:
                 return Response(
                     status=400, data={"input_error": "You must input exactly one id"}
@@ -175,12 +172,10 @@ class RelatedModelAPI(BaseModelAPI):
                 f"Cannot remove {self.field_name} from {self.model.__name__} due to non-null constraints."
                 " Did you mean to delete the object directly?"
             )
-        selected = list(self.field_model.objects.filter(id__in=self.__body_pk_ls))
-        for selected_product in selected:
-            try:
-                self.field_val.remove(selected_product)
-            except:
-                continue
+        selected_products = self.field_model.objects.filter(
+            id__in=self.__body_pk_ls
+        ).intersection(self.field_val.all())
+        self.field_val.remove(*selected_products)
         return self.__return_get_result_if_permitted(request, *args, **kwargs)
 
     @cached_property
@@ -238,7 +233,7 @@ class RelatedModelAPI(BaseModelAPI):
         return getattr(self.model_object, self.field_name)
 
     @cached_property
-    def field_model(self):
+    def field_model(self) -> Model:
         return self.field.related_model
 
     @cached_property
