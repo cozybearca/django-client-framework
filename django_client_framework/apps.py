@@ -19,8 +19,8 @@ class DefaultApp(AppConfig):
 
         from . import models  # noqa
 
-        if settings.DEBUG or settings.TUNE_TEST:
-            from . import api, models, serializers
+        if settings.DEBUG:
+            from . import api, serializers
 
             api.check_integrity()
             models.check_integrity()
