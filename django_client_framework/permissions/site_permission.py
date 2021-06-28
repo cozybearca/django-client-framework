@@ -9,7 +9,7 @@ from django.db.models.base import ModelBase
 from guardian import models as gm
 from guardian import shortcuts as gs
 from deprecation import deprecated
-from . import default_groups
+from .default_groups import default_groups
 
 LOG = getLogger(__name__)
 
