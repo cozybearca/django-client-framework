@@ -15,7 +15,6 @@ def do_nothing(group):
 class DefaultGroups:
     group_names = {
         "anyone": do_nothing,
-        "logged_in": do_nothing,
     }
 
     def __getattr__(self, name):
